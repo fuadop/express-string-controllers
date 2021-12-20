@@ -3,7 +3,7 @@ import fs from 'fs';
 // import callerPath from 'caller-path';
 import { Express, Router } from 'express';
 
-const loadControllers = (pathString?: string): Map<String, Function> => {
+const loadControllers = (pathString?: string): Map<string, Function> => {
   let initPath = require.main?.filename as string;
   // let initPath = callerPath() as string;
   let dir = path.dirname(initPath);
@@ -45,38 +45,40 @@ const loadControllers = (pathString?: string): Map<String, Function> => {
   return controllers;
 };
 
-const app = (express: Express, controllersPath?: string): Express => {
-  const controllers = loadControllers(controllersPath);
+export class App {
+  public express: Express
+  private _controllers: Map<string, Function>
 
-  const wrapped = { ...express };
-
-  const funcs = ['use', 'get', 'post', 'patch', 'put', 'delete', 'head'];
-
-  // Create objects for all possible express | router functions 
-  for (const func of funcs) {
-    // @ts-ignore
-    wrapped[func] = (...args) => {
-      const newArgs = [];
-      // check for controller strings
-      for (const arg of args) {
-        if (typeof arg === 'string') {
-          const conFunc = controllers.get(arg);
-          if (conFunc) {
-            newArgs.push(conFunc);
-          } else {
-            newArgs.push(arg);
-          }
-        } else {
-          newArgs.push(arg);
-        }
-      }
-
-      // @ts-ignore
-      return express[func](...newArgs);
-    }
+  constructor(express: Express) {
+    this.express = express
+    this._controllers = loadControllers()
+    // Object.getOwnPropertyNames(express).forEach((key) => {
+    //   // @ts-ignore
+    //   console.log(key, ': ', express[key])
+    // })
   }
 
-  return wrapped as Express;
-};
+  public listen(...args: any) {
+    this.express.listen(...args)
+  }
 
-export default app;
+  public get(...args: any) {
+    const $args = [];
+    for (const arg of args) {
+      if (typeof arg === 'string') {
+        const conFunc = this._controllers.get(arg);
+        if (conFunc) {
+          $args.push(conFunc);
+        } else {
+          $args.push(arg);
+        }
+      } else {
+        $args.push(arg);
+      }
+    }
+    // @ts-ignore
+    this.express.get(...$args)
+  }
+}
+
+export default App;
