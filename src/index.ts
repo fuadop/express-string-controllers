@@ -1,11 +1,10 @@
 import path from 'path';
 import fs from 'fs';
-// import callerPath from 'caller-path';
 import { Express, Router } from 'express';
+import { IExpress, IRouter } from './faces/types';
 
 const loadControllers = (pathString?: string): Map<string, Function> => {
   let initPath = require.main?.filename as string;
-  // let initPath = callerPath() as string;
   let dir = path.dirname(initPath);
   let cPath = `${dir}${path.sep}controllers${path.sep}`;
   const controllers = new Map<string, Function>();
@@ -46,39 +45,51 @@ const loadControllers = (pathString?: string): Map<string, Function> => {
 };
 
 export class App {
-  public express: Express
+  public express: Express | Router
   private _controllers: Map<string, Function>
+  private _whitelist: string[]
 
-  constructor(express: Express) {
-    this.express = express
-    this._controllers = loadControllers()
-    // Object.getOwnPropertyNames(express).forEach((key) => {
-    //   // @ts-ignore
-    //   console.log(key, ': ', express[key])
-    // })
+  constructor(express: Express | Router, controllersPath?: string) {
+    this.express = express;
+    this._controllers = loadControllers(controllersPath);
+    this._whitelist = ['listen', 'get', 'post', 'put', 'patch', 'delete', 'use'];
+    Object.getOwnPropertyNames(express).forEach((key) => {
+      try {
+        if (!this._whitelist.includes(key)) {
+          // @ts-ignore
+          this[key] = express[key]
+        }
+      } catch (e) {}
+    })
+
+    this._whitelist.filter(i => i !== 'listen').forEach((method) => {
+      // @ts-ignore
+      this[method] = (...args: any) => {
+        const $args = [];
+        for (const arg of args) {
+          if (typeof arg === 'string') {
+            const conFunc = this._controllers.get(arg);
+            if (conFunc) {
+              $args.push(conFunc);
+            } else {
+              $args.push(arg);
+            }
+          } else {
+            $args.push(arg);
+          }
+        }
+
+        // @ts-ignore
+        return this.express[method](...$args)
+      }
+    })
   }
 
   public listen(...args: any) {
-    this.express.listen(...args)
-  }
-
-  public get(...args: any) {
-    const $args = [];
-    for (const arg of args) {
-      if (typeof arg === 'string') {
-        const conFunc = this._controllers.get(arg);
-        if (conFunc) {
-          $args.push(conFunc);
-        } else {
-          $args.push(arg);
-        }
-      } else {
-        $args.push(arg);
-      }
-    }
     // @ts-ignore
-    this.express.get(...$args)
+    return this.express.listen(...args)
   }
 }
 
 export default App;
+export { IExpress, IRouter };
