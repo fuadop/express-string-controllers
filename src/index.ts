@@ -28,11 +28,11 @@ const loadControllers = (pathString?: string): Map<string, Function> => {
     // import the files and the default class exports
     const crl = require(path.resolve(cPath, file));
 
-    if (!crl || !crl.default) {
+    if (!crl) {
       continue;
     }
     
-    const def = crl.default;
+    const def = crl.default || crl;
     const controller = def.name;
     const methods = Object.getOwnPropertyNames(def).filter(i => typeof def[i] === 'function');
     

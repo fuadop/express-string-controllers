@@ -2,6 +2,18 @@
 
 Reduce imports in your expressjs apps using a controllers wrapper
 
+# Installation
+
+## Using NPM
+```sh
+  npm install express-string-controllers --save
+```
+
+## Using Yarn legacy 
+```sh
+  yarn add express-string-controllers
+```
+
 # Quick start
 
 If your folder structure is something like this:
@@ -82,3 +94,34 @@ class PetsController {
 export default PetsController;
 ```
 
+_For more examples, check the **\_\_tests\_\_** folder._
+
+### Using nodejs `require`
+
+> ./index.js
+```js
+const path = require('path');
+const express = require('express');const { App } = require("express-string-controllers");
+
+// controller path
+const cPath = path.join(__dirname, './controllers');
+
+// init app
+const app = new App(express(), cPath);
+
+// define routes
+app.get('/ban', 'PetsController.helloWorld');
+
+app.listen(2000, () => {  console.log('server started');
+});
+```
+> ./controllers/PetsController.js
+
+```js
+// default exports
+module.exports = class PetsController {
+  static async helloWorld(req, res, next) {
+    return res.send('hello world');
+  }
+}
+```
