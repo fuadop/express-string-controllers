@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Reduce imports with express wrapper",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --detectOpenHandles --silent",
     "build": "tsc"
