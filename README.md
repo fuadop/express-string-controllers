@@ -101,7 +101,9 @@ _For more examples, check the **\_\_tests\_\_** folder._
 > ./index.js
 ```js
 const path = require('path');
-const express = require('express');const { App } = require("express-string-controllers");
+const express = require('express');
+const { App } = require("express-string-controllers");
+
 
 // controller path
 const cPath = path.join(__dirname, './controllers');
