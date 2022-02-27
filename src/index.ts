@@ -86,8 +86,12 @@ export class App {
   }
 
   public listen(...args: any) {
-    // @ts-ignore
-    return this.express.listen(...args)
+    if ('listen' in this.express) {
+      // @ts-ignore
+      return this.express.listen(...args)
+    }
+
+    return null;
   }
 }
 

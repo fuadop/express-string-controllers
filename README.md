@@ -14,10 +14,10 @@ If your folder structure is something like this:
 index.ts
 ```js
 import express from 'express';
-import App from 'express-string-controllers';
+import App, { IExpress } from 'express-string-controllers';
 
 // wrap your express app
-const app = new App(express());
+const app: IExpress = new App(express());
 
 app.get('/pets', 'PetsController.getPets');
 
@@ -54,12 +54,12 @@ index.ts
 ```js
 import path from 'node:path';
 import express from 'express';
-import App from 'express-string-controllers';
+import App, { IExpress } from 'express-string-controllers';
 
 // wrap your express app
 const controllersPath = path.resolve(__dirname, './custom/custom_controller');
 
-const app = new App(express(), controllersPath);
+const app: IExpress = new App(express(), controllersPath);
 
 app.get('/pets', 'PetsController.getPets');
 
