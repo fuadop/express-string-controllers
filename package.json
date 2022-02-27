@@ -1,15 +1,19 @@
 {
   "name": "express-string-controllers",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Reduce imports with express wrapper",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles --silent"
+    "test": "jest --detectOpenHandles --silent",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fuadop/express-string-controllers.git"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "express",
     "string",
